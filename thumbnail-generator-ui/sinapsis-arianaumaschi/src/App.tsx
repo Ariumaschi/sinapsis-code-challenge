@@ -2,27 +2,42 @@ import React from 'react';
 import './App.css';
 import ImageUploader from './components/ImageUploader';
 import { useAuth0 } from '@auth0/auth0-react';
+import { Button, AppBar, Toolbar, Typography, Container } from '@mui/material';
 
 const App: React.FC = () => {
   const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
 
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>Generador de Thumbnails</h1>
-        {isAuthenticated ? (
-          <>
-            <button
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Generador de Thumbnails
+          </Typography>
+          {isAuthenticated ? (
+            <Button
+              color="inherit"
               onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
             >
               Logout
-            </button>
-            <ImageUploader />
-          </>
+            </Button>
+          ) : (
+            <Button color="inherit" onClick={() => loginWithRedirect()}>
+              Login
+            </Button>
+          )}
+        </Toolbar>
+      </AppBar>
+
+      <Container sx={{ mt: 4 }}>
+        {isAuthenticated ? (
+          <ImageUploader />
         ) : (
-          <button onClick={() => loginWithRedirect()}>Login</button>
+          <Typography variant="h5" textAlign="center">
+            Por favor, inicia sesión para usar la aplicación.
+          </Typography>
         )}
-      </header>
+      </Container>
     </div>
   );
 };
