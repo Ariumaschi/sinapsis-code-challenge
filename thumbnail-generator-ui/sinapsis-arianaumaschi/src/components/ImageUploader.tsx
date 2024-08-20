@@ -1,11 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { uploadImage } from '../services/thumbnailService';
-import { Box, Button, Typography, Input, ImageList, ImageListItem, ImageListItemBar } from '@mui/material';
+import { Box, Button, Typography, Input, ImageList, ImageListItem, ImageListItemBar, CircularProgress } from '@mui/material';
 
 const ImageUploader: React.FC = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [thumbnailUrls, setThumbnailUrls] = useState<{ url: string; image: string }[]>([]);
+    const [loading, setLoading] = useState<boolean>(false); // Nuevo estado para gestionar el loading
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,6 +19,7 @@ const ImageUploader: React.FC = () => {
 
     const handleUpload = async () => {
         if (selectedFile) {
+            setLoading(true); // Mostrar el loader
             try {
                 // Limpia la vista previa y el archivo seleccionado
                 setPreviewUrl(null);
@@ -34,6 +36,8 @@ const ImageUploader: React.FC = () => {
                 setThumbnailUrls((prevUrls) => [...prevUrls, { url, image }]);
             } catch (error) {
                 console.error('Error al subir la imagen:', error);
+            } finally {
+                setLoading(false); // Ocultar el loader después de la carga
             }
         }
     };
@@ -70,7 +74,7 @@ const ImageUploader: React.FC = () => {
                     />
                 </Box>
             )}
-            {selectedFile && ( // Mostrar el botón solo si hay un archivo seleccionado
+            {selectedFile && !loading && ( // Mostrar el botón solo si hay un archivo seleccionado y no está cargando
                 <Button
                     variant="contained"
                     color="primary"
@@ -80,6 +84,11 @@ const ImageUploader: React.FC = () => {
                     Subir Imagen
                 </Button>
             )}
+            {loading && ( // Mostrar el loader cuando esté cargando
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                    <CircularProgress />
+                </Box>
+            )}
             <Typography variant="h6">Imágenes subidas:</Typography>
             <ImageList sx={{ width: '100%', height: 450 }}>
                 {thumbnailUrls.map((item, index) => (
@@ -88,6 +97,7 @@ const ImageUploader: React.FC = () => {
                             src={item.image}
                             alt={`Thumbnail ${index}`}
                             loading="lazy"
+                            style={{ objectFit: 'cover' }} // Ajustar imagen para cubrir el área
                         />
                         <ImageListItemBar
                             title={`Thumbnail ${index}`}
