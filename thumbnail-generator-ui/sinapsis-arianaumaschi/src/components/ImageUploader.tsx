@@ -1,13 +1,17 @@
 import React, { useState, useRef } from 'react';
 import { uploadImage } from '../services/thumbnailService';
-import { Box, Button, Typography, Input, ImageList, ImageListItem, ImageListItemBar, CircularProgress } from '@mui/material';
+import { Box, Button, Typography, Input, ImageList, ImageListItem, ImageListItemBar, CircularProgress, useMediaQuery, useTheme } from '@mui/material';
 
 const ImageUploader: React.FC = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [thumbnailUrls, setThumbnailUrls] = useState<{ url: string; image: string }[]>([]);
-    const [loading, setLoading] = useState<boolean>(false); // Nuevo estado para gestionar el loading
+    const [loading, setLoading] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -19,40 +23,50 @@ const ImageUploader: React.FC = () => {
 
     const handleUpload = async () => {
         if (selectedFile) {
-            setLoading(true); // Mostrar el loader
+            setLoading(true);
             try {
-                // Limpia la vista previa y el archivo seleccionado
                 setPreviewUrl(null);
                 setSelectedFile(null);
-                // Limpiar el input
                 if (fileInputRef.current) {
                     fileInputRef.current.value = '';
                 }
-
-                // Simula la subida de la imagen y obtiene la URL
                 const { url, image } = await uploadImage(selectedFile);
-
-                // Agrega la URL del thumbnail a la lista
                 setThumbnailUrls((prevUrls) => [...prevUrls, { url, image }]);
             } catch (error) {
                 console.error('Error al subir la imagen:', error);
             } finally {
-                setLoading(false); // Ocultar el loader después de la carga
+                setLoading(false);
             }
         }
     };
 
     return (
-        <Box sx={{ textAlign: 'center', mt: 4 }}>
+        <Box // TODO
+            sx={{
+               
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                width: '100%',
+                p: 2,
+                borderRadius: 2,
+                padding: '0px',
+                textAlign: 'center',
+                mt: 4,
+                backgroundColor: 'aqua',
+
+                
+            }}
+        >
             <Input
                 type="file"
                 onChange={handleFileChange}
                 inputRef={fileInputRef}
-                sx={{ display: 'none' }} // Ocultar el input de archivo
+                sx={{ display: 'none' }}
             />
             <Button
                 variant="contained"
-                component="label" // El botón actuará como un contenedor para el input
+                component="label"
                 sx={{ mb: 2 }}
             >
                 Seleccionar archivo
@@ -60,7 +74,7 @@ const ImageUploader: React.FC = () => {
                     type="file"
                     onChange={handleFileChange}
                     inputRef={fileInputRef}
-                    sx={{ display: 'none' }} // Ocultar el input de archivo
+                    sx={{ display: 'none' }}
                 />
             </Button>
 
@@ -70,11 +84,11 @@ const ImageUploader: React.FC = () => {
                     <img
                         src={previewUrl}
                         alt="Vista previa"
-                        style={{ maxWidth: '200px', maxHeight: '200px' }}
+                        style={{ maxWidth: '100%', maxHeight: '40vh' }}
                     />
                 </Box>
             )}
-            {selectedFile && !loading && ( // Mostrar el botón solo si hay un archivo seleccionado y no está cargando
+            {selectedFile && !loading && (
                 <Button
                     variant="contained"
                     color="primary"
@@ -84,29 +98,66 @@ const ImageUploader: React.FC = () => {
                     Subir Imagen
                 </Button>
             )}
-            {loading && ( // Mostrar el loader cuando esté cargando
+            {loading && (
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
                     <CircularProgress />
                 </Box>
             )}
-            <Typography variant="h6">Imágenes subidas:</Typography>
-            <ImageList sx={{ width: '100%', height: 450 }}>
-                {thumbnailUrls.map((item, index) => (
-                    <ImageListItem key={index}>
-                        <img
-                            src={item.image}
-                            alt={`Thumbnail ${index}`}
-                            loading="lazy"
-                            style={{ objectFit: 'cover' }} // Ajustar imagen para cubrir el área
-                        />
-                        <ImageListItemBar
-                            title={`Thumbnail ${index}`}
-                            subtitle={<span>{item.url}</span>}
-                            position="below"
-                        />
-                    </ImageListItem>
-                ))}
-            </ImageList>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    borderTop: '10px solid red',
+                    backgroundColor: 'pink',
+                    p: 2,
+                    maxWidth: '100%',
+                }}
+            >
+                <Typography variant="h6">Imágenes subidas:</Typography>
+                <ImageList
+                    sx={{
+                        maxWidth: '100%',
+                        height: 'auto',
+                        backgroundColor: 'orange',
+                    }}
+                    cols={isMobile ? 1 : (isTablet ? 2 : 2)}
+                >
+                    {thumbnailUrls.map((item, index) => (
+                        <ImageListItem
+                            key={index}
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'center', // Centra la imagen horizontalmente
+                                alignItems: 'center',     // Centra la imagen verticalmente
+                                overflow: 'hidden',       // Oculta el contenido que se desborda
+                                border: '4px solid black'
+                            }}
+                        >                            <img
+                                src={item.image}
+                                alt={`Thumbnail ${index}`}
+                                loading="lazy"
+                                style={{
+                                    maxWidth: '100%',
+                                    maxHeight: '100%',
+                                    width: 'auto',
+                                    height: 'auto',
+                                    objectFit: 'contain', // Asegura que la imagen completa se vea sin distorsión
+                                    border: '2px solid blue',
+                                }}
+                            />
+                            <ImageListItemBar
+                                title={`Thumbnail ${index}`}
+                                subtitle={<span>{item.url}</span>}
+                                position="below"
+                                sx={{
+                                    backgroundColor: 'gold', textAlign: 'center', maxWidth: '70%',
+                                }}
+                            />
+                        </ImageListItem>
+                    ))}
+                </ImageList>
+            </Box>
         </Box>
     );
 };
