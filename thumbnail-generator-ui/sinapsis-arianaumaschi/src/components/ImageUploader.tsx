@@ -16,7 +16,8 @@ const ImageUploader: React.FC = () => {
         y: 25,
         width: 50,
         height: 50,
-    }); const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
+    });
+    const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
     const [croppedImageUrl, setCroppedImageUrl] = useState<string | null>(null);
     const imageRef = useRef<HTMLImageElement | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -57,7 +58,12 @@ const ImageUploader: React.FC = () => {
 
                 // Subir la imagen recortada
                 const { url, image } = await uploadImage(croppedFile);
+
                 setThumbnailUrls((prevUrls) => [...prevUrls, { url, image }]);
+                setCroppedImageUrl(null)
+                setCompletedCrop(null)
+                setPreviewUrl(null)
+                setSelectedFile(null)
             } catch (error) {
                 console.error('Error al subir la imagen:', error);
             } finally {
@@ -185,7 +191,6 @@ const ImageUploader: React.FC = () => {
                     >
                         <img
                             ref={imageRef}
-
                             src={previewUrl}
                             alt="Preview"
                             onLoad={onImageLoaded}
@@ -197,7 +202,7 @@ const ImageUploader: React.FC = () => {
                 </Box>
             )}
 
-            {croppedImageUrl && (
+            {croppedImageUrl && completedCrop && (
                 <Box sx={{ mb: 2 }}>
                     <Typography variant="h6">Vista previa de la imagen recortada:</Typography>
                     <img src={croppedImageUrl} alt="Cropped Preview" style={{ maxWidth: '100%', maxHeight: '40vh' }} />
