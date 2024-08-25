@@ -1,8 +1,10 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { uploadImage } from '../services/thumbnailService';
-import { Box, Button, Typography, Input, ImageList, ImageListItem, ImageListItemBar, CircularProgress, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Button, Typography, Input, ImageList, Divider, ImageListItem, ImageListItemBar, CircularProgress, useMediaQuery, useTheme } from '@mui/material';
 import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+import ImagesGallery from './ImagesGallery';
+
 
 const ImageUploader: React.FC = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -16,8 +18,7 @@ const ImageUploader: React.FC = () => {
         y: 25,
         width: 50,
         height: 50,
-    });
-    const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
+    }); const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
     const [croppedImageUrl, setCroppedImageUrl] = useState<string | null>(null);
     const imageRef = useRef<HTMLImageElement | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -58,12 +59,12 @@ const ImageUploader: React.FC = () => {
 
                 // Subir la imagen recortada
                 const { url, image } = await uploadImage(croppedFile);
-
                 setThumbnailUrls((prevUrls) => [...prevUrls, { url, image }]);
                 setCroppedImageUrl(null)
                 setCompletedCrop(null)
                 setPreviewUrl(null)
                 setSelectedFile(null)
+
             } catch (error) {
                 console.error('Error al subir la imagen:', error);
             } finally {
@@ -152,129 +153,152 @@ const ImageUploader: React.FC = () => {
             handleFileDrop(e.dataTransfer.files[0]);
         }
     };
-
     return (
-        <Box sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%',
-            p: 2,
-            borderRadius: 2,
-            textAlign: 'center',
-            mt: 4,
-            backgroundColor: isDragging ? 'lightblue' : 'aqua',
-            border: isDragging ? '2px dashed #000' : '2px solid #000',
-            transition: 'background-color 0.3s, border 0.3s',
-            cursor: 'pointer',
-        }}
+        <Box
+            sx={{
+                width: '100%',
+                minHeight: '80vh',
+                p: 4,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                backgroundColor: '#f2f2f2',
+                boxSizing: 'border-box' // Asegura que el padding y el border se incluyan en el ancho total
+            }}
+        >          <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                width: '100%',
+                maxWidth: 800,
+                p: 4,
+                borderRadius: 4,
+                textAlign: 'center',
+                mt: 4,
+                backgroundColor: isDragging ? '#f7e6b4' : '#f2f2f2',
+                border: isDragging ? '2px dashed black' : '2px solid black',
+                transition: 'background-color 0.3s, border 0.3s',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+                minHeight: '350px',
+                justifyContent: 'center',
+                boxSizing: 'border-box', // Asegura que el padding y el border se incluyan en el ancho total
+            }}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
-            onDrop={handleDrop}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-                {isDragging ? 'Suelta el archivo aquí' : 'Arrastra y suelta un archivo o selecciona uno'}
-            </Typography>
+            onDrop={handleDrop}
+        >
+                <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: 'black' }}>
+                    {isDragging ? 'Suelta el archivo aquí' : 'Arrastra y suelta un archivo o selecciona uno'}
+                </Typography>
 
-            <Input type="file" onChange={handleFileChange} inputRef={fileInputRef} sx={{ display: 'none' }} />
-            <Button variant="contained" component="label" sx={{ mb: 2 }}>
-                Seleccionar archivo
-                <Input type="file" onChange={handleFileChange} inputRef={fileInputRef} sx={{ display: 'none' }} />
-            </Button>
-
-            {previewUrl && (
-                <Box sx={{ mb: 2 }}>
-                    <Typography variant="h6">Recortar Imagen:</Typography>
-                    <ReactCrop
-                        crop={crop}
-                        onChange={(newCrop) => setCrop(newCrop)}
-                        onComplete={(c) => setCompletedCrop(c)}
-                    >
-                        <img
-                            ref={imageRef}
-                            src={previewUrl}
-                            alt="Preview"
-                            onLoad={onImageLoaded}
-                        />
-                    </ReactCrop>
-                    <Button variant="contained" color="primary" onClick={generateCroppedImage} sx={{ mt: 2 }}>
-                        Generar Imagen Recortada
-                    </Button>
-                </Box>
-            )}
-
-            {croppedImageUrl && completedCrop && (
-                <Box sx={{ mb: 2 }}>
-                    <Typography variant="h6">Vista previa de la imagen recortada:</Typography>
-                    <img src={croppedImageUrl} alt="Cropped Preview" style={{ maxWidth: '100%', maxHeight: '40vh' }} />
-                </Box>
-            )}
-
-            {croppedImageUrl && !loading && (
-                <Button variant="contained" color="primary" onClick={handleUpload} sx={{ mb: 4 }}>
-                    Subir Imagen Recortada
-                </Button>
-            )}
-
-            {loading && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                    <CircularProgress />
-                </Box>
-            )}
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    borderTop: '10px solid red',
-                    backgroundColor: 'pink',
-                    p: 2,
-                    maxWidth: '100%',
-                }}
-            >
-                <Typography variant="h6">Imágenes subidas:</Typography>
-                <ImageList
+                <Button
+                    variant="contained"
+                    component="label"
                     sx={{
-                        maxWidth: '100%',
-                        height: 'auto',
-                        backgroundColor: 'orange',
+                        mb: 3,
+                        bgcolor: '#FFC80F',
+                        '&:hover': {
+                            bgcolor: '#f7e6b4',
+                        },
+                        color: 'black',
+                        borderRadius: 4,
+                        textTransform: 'capitalize'
                     }}
-                    cols={isMobile ? 1 : (isTablet ? 2 : 2)}
                 >
-                    {thumbnailUrls.map((item, index) => (
-                        <ImageListItem
-                            key={index}
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                overflow: 'hidden',
-                                border: '4px solid black'
-                            }}
+                    Seleccionar archivo
+                    <Input type="file" onChange={handleFileChange} inputRef={fileInputRef} sx={{ display: 'none' }} />
+                </Button>
+
+                {previewUrl && (
+                    <Box sx={{ mb: 3, width: '100%', maxWidth: 600, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: 'black' }}>
+                            Recortar Imagen:
+                        </Typography>
+                        <ReactCrop
+                            crop={crop}
+                            onChange={(newCrop) => setCrop(newCrop)}
+                            onComplete={(c) => setCompletedCrop(c)}
                         >
                             <img
-                                src={item.image}
-                                alt={`Thumbnail ${index}`}
-                                loading="lazy"
-                                style={{
-                                    maxWidth: '100%',
-                                    maxHeight: '100%',
-                                    width: 'auto',
-                                    height: 'auto',
-                                    objectFit: 'contain',
-                                    border: '2px solid blue',
-                                }}
+                                ref={imageRef}
+                                src={previewUrl}
+                                alt="Preview"
+                                style={{ width: '100%', borderRadius: 4, boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)' }}
+                                onLoad={onImageLoaded}
                             />
-                            <ImageListItemBar
-                                title={`Thumbnail ${index}`}
-                                subtitle={<span>{item.url}</span>}
-                                position="below"
-                                sx={{
-                                    backgroundColor: 'gold', textAlign: 'center', maxWidth: '70%',
-                                }}
-                            />
-                        </ImageListItem>
-                    ))}
-                </ImageList>
+                        </ReactCrop>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={generateCroppedImage}
+                            sx={{
+                                mb: 3,
+                                bgcolor: '#FFC80F',
+                                '&:hover': {
+                                    bgcolor: '#f7e6b4',
+                                },
+                                color: 'black',
+                                borderRadius: 4,
+                                textTransform: 'capitalize'
+                            }}         >
+                            Generar Imagen Recortada
+                        </Button>
+                    </Box>
+                )}
+
+                {croppedImageUrl && (
+                    <Box sx={{ mb: 3, width: '100%', maxWidth: 600, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: 'black' }}>
+                            Vista previa de la imagen recortada:
+                        </Typography>
+                        <img
+                            src={croppedImageUrl}
+                            alt="Cropped Preview"
+                            style={{
+                                width: '100%',
+                                maxWidth: '100%',
+                                maxHeight: '50vh',
+                                borderRadius: 4,
+                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+                            }}
+                        />
+                    </Box>
+                )}
+
+                {croppedImageUrl && !loading && (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleUpload}
+                        sx={{
+                            mb: 3,
+                            bgcolor: '#FFC80F',
+                            '&:hover': {
+                                bgcolor: '#f7e6b4',
+                            },
+                            color: 'black',
+                            borderRadius: 4,
+                            textTransform: 'capitalize'
+                        }}     >
+                        Subir Imagen Recortada
+                    </Button>
+                )}
+
+                {loading && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                        <CircularProgress />
+                    </Box>
+                )}
+            </Box>
+
+            <Divider sx={{ my: 4, width: '100%', maxWidth: 800 }} />
+
+            {/* Sección independiente para imágenes subidas */}
+            <Box sx={{ mt: 4, width: '100%', maxWidth: 1200, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+
+                <ImagesGallery thumbnailUrls={thumbnailUrls} />
             </Box>
         </Box>
     );
