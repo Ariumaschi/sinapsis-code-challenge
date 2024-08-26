@@ -9,7 +9,7 @@ const listItemStyles = {
   borderRadius: 1,
   transition: 'background-color 0.3s ease',
   '&:hover': {
-    backgroundColor: '#f7e6b4', // Tono más claro al pasar el cursor
+    backgroundColor: '#f7e6b4',
     cursor: 'pointer',
     color: 'black',
 
@@ -17,31 +17,31 @@ const listItemStyles = {
 };
 const App: React.FC = () => {
   const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
-  const [loading, setLoading] = useState<boolean>(false); // Nuevo estado para gestionar el loading
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleLogin = async () => {
-    setLoading(true); // Mostrar el loader al iniciar el proceso de login
+    setLoading(true);
     try {
-      await loginWithRedirect(); // Iniciar el proceso de login
+      await loginWithRedirect();
     } catch (error) {
       console.error('Error en el login:', error);
     } finally {
       setTimeout(() => {
-        setLoading(false); // Ocultar el loader después de un retraso
+        setLoading(false);
       }, 2000);
     }
   };
 
 
   const handleLogout = async () => {
-    setLoading(true); // Mostrar el loader al iniciar el proceso de login
+    setLoading(true);
     try {
-      await logout({ logoutParams: { returnTo: window.location.origin } }); // Iniciar el proceso de login
+      await logout({ logoutParams: { returnTo: window.location.origin } });
     } catch (error) {
       console.error('Error en el logout:', error);
     } finally {
       setTimeout(() => {
-        setLoading(false); // Ocultar el loader después de un retraso
+        setLoading(false);
       }, 2000);
     }
   };
@@ -51,9 +51,9 @@ const App: React.FC = () => {
       <AppBar
         position="static"
         sx={{
-          backgroundColor: '#FFC80F', // Color de fondo amarillo brillante
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Sombra ligera para profundidad
-          borderBottom: '1px solid rgba(0, 0, 0, 0.12)', // Borde inferior sutil
+          backgroundColor: '#FFC80F',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
         }}
       >
         <Toolbar>
@@ -64,12 +64,11 @@ const App: React.FC = () => {
             <Button
               sx={{
                 color: 'black',
-                bgcolor: 'transparent', // Si también quieres cambiar el fondo
+                bgcolor: 'transparent',
                 '&:hover': {
-                  bgcolor: '#e0e0e0', // Color al pasar el mouse (opcional)
+                  bgcolor: '#e0e0e0',
                 }
-              }} onClick={handleLogout} // Usar la función handleLogin en lugar de loginWithRedirect directamente
-            >
+              }} onClick={handleLogout} >
               Logout
             </Button>
 
@@ -86,9 +85,9 @@ const App: React.FC = () => {
 
                 sx={{
                   color: 'black',
-                  bgcolor: 'transparent', // Si también quieres cambiar el fondo
+                  bgcolor: 'transparent',
                   '&:hover': {
-                    bgcolor: '#e0e0e0', // Color al pasar el mouse (opcional)
+                    bgcolor: '#e0e0e0',
                   }
                 }}
               >
@@ -98,14 +97,14 @@ const App: React.FC = () => {
               <Button
                 sx={{
                   color: 'black',
-                  bgcolor: 'transparent', // Si también quieres cambiar el fondo
+                  bgcolor: 'transparent',
                   '&:hover': {
-                    bgcolor: '#e0e0e0', // Color al pasar el mouse (opcional)
+                    bgcolor: '#e0e0e0',
                   }
                 }}
-                onClick={handleLogin} // Usar la función handleLogin en lugar de loginWithRedirect directamente
+                onClick={handleLogin}
               >
-                Iniciar sesión 
+                Iniciar sesión
               </Button>
             </Box>
           )}

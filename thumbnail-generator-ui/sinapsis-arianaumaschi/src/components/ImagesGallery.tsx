@@ -17,10 +17,10 @@ const ImagesGallery: React.FC<ImagesGalleryProps> = ({ thumbnailUrls }) => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                backgroundColor: '#rgba(165, 214, , 0.3)',  
+                backgroundColor: '#rgba(165, 214, , 0.3)',
                 p: 4,
                 width: '100%',
-                borderTop: `2px dashed black `,  
+                borderTop: `2px dashed black `,
             }}
         >
             <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: 'black' }}>
@@ -31,9 +31,9 @@ const ImagesGallery: React.FC<ImagesGalleryProps> = ({ thumbnailUrls }) => {
                     width: '100%',
                     maxWidth: 1200,
                     height: 'auto',
-                    backgroundColor: 'transparent', // Fondo transparente para no sobrecargar el diseño
+                    backgroundColor: 'transparent',
                 }}
-                cols={isMobile ? 1 : (isTablet ? 2 : 3)} // Ajustar el número de columnas
+                cols={isMobile ? 1 : (isTablet ? 2 : 3)}
             >
                 {thumbnailUrls.map((item, index) => (
                     <ImageListItem
@@ -43,9 +43,9 @@ const ImagesGallery: React.FC<ImagesGalleryProps> = ({ thumbnailUrls }) => {
                             justifyContent: 'center',
                             alignItems: 'center',
                             overflow: 'hidden',
-                            border: `4px solid black`, // Usar color primario del tema
+                            border: `4px solid black`, 
                             borderRadius: 2,
-                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Suave sombra para un toque moderno
+                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',  
                         }}
                     >
                         <img
@@ -76,9 +76,9 @@ const ImagesGallery: React.FC<ImagesGalleryProps> = ({ thumbnailUrls }) => {
                             }
                             position="below"
                             sx={{
-                                backgroundColor: '#ffffff', // Fondo blanco para el texto
-                                color: theme.palette.text.primary, // Usar color de texto primario del tema
-                                borderTop: `1px solid black`, // Usar color primario del tema
+                                backgroundColor: '#ffffff',  
+                                color: theme.palette.text.primary,  
+                                borderTop: `1px solid black`,  
                                 width: '100%',
                                 textAlign: 'center',
                             }}

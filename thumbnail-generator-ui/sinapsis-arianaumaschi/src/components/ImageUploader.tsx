@@ -61,10 +61,9 @@ const ImageUploader: React.FC = () => {
             console.log("croppedImageUrl ok");
             setLoading(true);
             try {
-                // Establecer la URL de vista previa recortada
+                // URL de vista previa recortada
                 setPreviewUrl(croppedImageUrl);
 
-                // Verificar si selectedFile está disponible y válido antes de continuar
                 if (!selectedFile) {
                     throw new Error('No se ha seleccionado ningún archivo.');
                 }
@@ -117,7 +116,7 @@ const ImageUploader: React.FC = () => {
             x: 0,
             y: 0
         });
-        return false; // No es necesario, puedes eliminar esto si no lo necesitas
+        return false;
     };
 
     const onCropComplete = (crop: Crop) => {

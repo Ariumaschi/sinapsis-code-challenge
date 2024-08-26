@@ -1,6 +1,6 @@
 interface UploadResponse {
   url: string;
-  image: string; // Puedes ajustar este tipo según cómo quieres representar la imagen
+  image: string;  
 }
 
 export const uploadImage = async (file: File): Promise<UploadResponse> => {
