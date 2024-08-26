@@ -12,13 +12,16 @@ const ImageUploader: React.FC = () => {
     const [thumbnailUrls, setThumbnailUrls] = useState<{ url: string; image: string }[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [isDragging, setIsDragging] = useState<boolean>(false);
+    const [editImage, setEditImage] = useState<boolean>(false);
+
     const [crop, setCrop] = useState<Crop>({
-        unit: '%', // Puede ser 'px' o '%'
-        x: 25,
-        y: 25,
-        width: 50,
-        height: 50,
-    }); const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
+        unit: 'px', // Puede ser 'px' o '%'
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+    });
+    const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
     const [croppedImageUrl, setCroppedImageUrl] = useState<string | null>(null);
     const imageRef = useRef<HTMLImageElement | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -34,7 +37,26 @@ const ImageUploader: React.FC = () => {
             setPreviewUrl(URL.createObjectURL(file));
         }
     };
+
     const handleUpload = async () => {
+        if (selectedFile) {
+            setLoading(true);
+            try {
+                setPreviewUrl(null);
+                setSelectedFile(null);
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
+                const { url, image } = await uploadImage(selectedFile);
+                setThumbnailUrls((prevUrls) => [...prevUrls, { url, image }]);
+            } catch (error) {
+                console.error('Error al subir la imagen:', error);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+    const handleCroppedUpload = async () => {
         if (croppedImageUrl) {
             console.log("croppedImageUrl ok");
             setLoading(true);
@@ -75,9 +97,27 @@ const ImageUploader: React.FC = () => {
         }
     };
 
-    const onImageLoaded = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-        const img = e.currentTarget; // Accedes al elemento img desde el evento
-        // Resto del código para manejar la imagen cargada
+    const onImageLoaded = (event: React.SyntheticEvent<HTMLImageElement>) => {
+        const image = event.currentTarget; // Acceder al elemento de imagen
+        imageRef.current = image;
+
+        const { width, height } = image;
+        console.log(image)
+        setCrop({
+            unit: 'px',
+            width: width,
+            height: height,
+            x: 0,
+            y: 0
+        });
+        setCompletedCrop({
+            unit: 'px',
+            width: width,
+            height: height,
+            x: 0,
+            y: 0
+        });
+        return false; // No es necesario, puedes eliminar esto si no lo necesitas
     };
 
     const onCropComplete = (crop: Crop) => {
@@ -163,7 +203,7 @@ const ImageUploader: React.FC = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 backgroundColor: '#f2f2f2',
-                boxSizing: 'border-box' // Asegura que el padding y el border se incluyan en el ancho total
+                boxSizing: 'border-box'
             }}
         >          <Box
             sx={{
@@ -183,7 +223,7 @@ const ImageUploader: React.FC = () => {
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
                 minHeight: '350px',
                 justifyContent: 'center',
-                boxSizing: 'border-box', // Asegura que el padding y el border se incluyan en el ancho total
+                boxSizing: 'border-box',
             }}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -195,6 +235,8 @@ const ImageUploader: React.FC = () => {
 
                 <Button
                     variant="contained"
+                    onClick={() => setPreviewUrl(null)}
+
                     component="label"
                     sx={{
                         mb: 3,
@@ -211,42 +253,98 @@ const ImageUploader: React.FC = () => {
                     <Input type="file" onChange={handleFileChange} inputRef={fileInputRef} sx={{ display: 'none' }} />
                 </Button>
 
-                {previewUrl && (
-                    <Box sx={{ mb: 3, width: '100%', maxWidth: 600, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: 'black' }}>
-                            Recortar Imagen:
-                        </Typography>
-                        <ReactCrop
-                            crop={crop}
-                            onChange={(newCrop) => setCrop(newCrop)}
-                            onComplete={(c) => setCompletedCrop(c)}
-                        >
+
+                <Box sx={{ mb: 2 }}>
+                    {/* Mostrar la vista previa si hay previewUrl y editImage es falso */}
+                    {previewUrl && !editImage && (
+                        <Box sx={{ mb: 2 }}>
+                            <Typography variant="h6">Vista previa:</Typography>
                             <img
-                                ref={imageRef}
                                 src={previewUrl}
-                                alt="Preview"
-                                style={{ width: '100%', borderRadius: 4, boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)' }}
-                                onLoad={onImageLoaded}
+                                alt="Vista previa"
+                                style={{ maxWidth: '100%', maxHeight: '40vh' }}
                             />
-                        </ReactCrop>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={generateCroppedImage}
-                            sx={{
-                                mb: 3,
-                                bgcolor: '#FFC80F',
-                                '&:hover': {
-                                    bgcolor: '#f7e6b4',
-                                },
-                                color: 'black',
-                                borderRadius: 4,
-                                textTransform: 'capitalize'
-                            }}         >
-                            Generar Imagen Recortada
-                        </Button>
-                    </Box>
-                )}
+                            <Box sx={{ mb: 3, width: '100%', maxWidth: 600, display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '2%' }}>
+                                <Button
+                                    onClick={() => setEditImage(true)}
+                                    variant="contained"
+                                    component="label"
+                                    sx={{
+                                        mb: 3,
+                                        bgcolor: '#FFC80F',
+                                        '&:hover': {
+                                            bgcolor: '#f7e6b4',
+                                        },
+                                        color: 'black',
+                                        borderRadius: 4,
+                                        textTransform: 'capitalize'
+                                    }}
+                                >
+                                    Editar Imagen
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleUpload}
+                                    sx={{
+                                        mb: 3,
+                                        bgcolor: '#FFC80F',
+                                        '&:hover': {
+                                            bgcolor: '#f7e6b4',
+                                        },
+                                        color: 'black',
+                                        borderRadius: 4,
+                                        textTransform: 'capitalize'
+                                    }}     >
+                                    Subir Imagen
+                                </Button>
+                            </Box>
+                        </Box>
+
+                    )}
+
+                    {/* Mostrar el recorte de imagen si hay previewUrl y editImage es verdadero */}
+                    {previewUrl && editImage && (
+                        <Box sx={{ mb: 3, width: '100%', maxWidth: 600, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: 'black' }}>
+                                Recortar Imagen:
+                            </Typography>
+                            <ReactCrop
+                                crop={crop}
+                                onChange={(newCrop) => setCrop(newCrop)}
+                                onComplete={(c) => setCompletedCrop(c)}
+                            >
+                                <img
+                                    ref={imageRef}
+                                    src={previewUrl}
+                                    alt="Preview"
+                                    style={{ width: '100%', borderRadius: 4, boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)' }}
+                                    onLoad={onImageLoaded}
+                                />
+                            </ReactCrop>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={generateCroppedImage}
+                                sx={{
+                                    mb: 3,
+                                    bgcolor: '#FFC80F',
+                                    '&:hover': {
+                                        bgcolor: '#f7e6b4',
+                                    },
+                                    color: 'black',
+                                    borderRadius: 4,
+                                    textTransform: 'capitalize',
+                                    marginTop: '2%'
+                                }}
+                            >
+                                Generar Imagen Recortada
+                            </Button>
+                        </Box>
+                    )}
+                </Box>
+
+
 
                 {croppedImageUrl && (
                     <Box sx={{ mb: 3, width: '100%', maxWidth: 600, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -257,7 +355,6 @@ const ImageUploader: React.FC = () => {
                             src={croppedImageUrl}
                             alt="Cropped Preview"
                             style={{
-                                width: '100%',
                                 maxWidth: '100%',
                                 maxHeight: '50vh',
                                 borderRadius: 4,
@@ -271,7 +368,7 @@ const ImageUploader: React.FC = () => {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={handleUpload}
+                        onClick={handleCroppedUpload}
                         sx={{
                             mb: 3,
                             bgcolor: '#FFC80F',

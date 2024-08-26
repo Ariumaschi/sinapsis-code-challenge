@@ -62,19 +62,52 @@ const App: React.FC = () => {
           </Typography>
           {isAuthenticated ? (
             <Button
-              color="inherit"
-              onClick={handleLogout} // Usar la función handleLogin en lugar de loginWithRedirect directamente
+              sx={{
+                color: 'black',
+                bgcolor: 'transparent', // Si también quieres cambiar el fondo
+                '&:hover': {
+                  bgcolor: '#e0e0e0', // Color al pasar el mouse (opcional)
+                }
+              }} onClick={handleLogout} // Usar la función handleLogin en lugar de loginWithRedirect directamente
             >
               Logout
             </Button>
 
           ) : (
-            <Button
-              color="inherit"
-              onClick={handleLogin} // Usar la función handleLogin en lugar de loginWithRedirect directamente
-            >
-              Login
-            </Button>
+
+            <Box>
+              <Button
+
+                onClick={() => loginWithRedirect({
+                  authorizationParams: {
+                    screen_hint: 'signup'
+                  }
+                })}
+
+                sx={{
+                  color: 'black',
+                  bgcolor: 'transparent', // Si también quieres cambiar el fondo
+                  '&:hover': {
+                    bgcolor: '#e0e0e0', // Color al pasar el mouse (opcional)
+                  }
+                }}
+              >
+                Registrarse
+              </Button>
+
+              <Button
+                sx={{
+                  color: 'black',
+                  bgcolor: 'transparent', // Si también quieres cambiar el fondo
+                  '&:hover': {
+                    bgcolor: '#e0e0e0', // Color al pasar el mouse (opcional)
+                  }
+                }}
+                onClick={handleLogin} // Usar la función handleLogin en lugar de loginWithRedirect directamente
+              >
+                Iniciar sesión 
+              </Button>
+            </Box>
           )}
         </Toolbar>
       </AppBar>
@@ -99,19 +132,19 @@ const App: React.FC = () => {
               </Typography>
 
               <List sx={{ color: 'white', fontSize: '1.1rem', lineHeight: 1.6 }}>
-          <ListItem sx={listItemStyles}>1. Carga de archivos mediante HTTP</ListItem>
-          <ListItem sx={listItemStyles}>2. Simulación de endpoints requeridos</ListItem>
-          <ListItem sx={listItemStyles}>3. Vista previa de la imagen a procesar</ListItem>
-          <ListItem sx={listItemStyles}>4. Generación y visualización de URLs de miniaturas</ListItem>
-          <ListItem sx={listItemStyles}>5. Funcionalidades del MVP (50 puntos)</ListItem>
-          <ListItem sx={listItemStyles}>6. Funcionalidad de arrastrar y soltar (5 puntos)</ListItem>
-          <ListItem sx={listItemStyles}>7. Área de recorte y redimensionamiento (5 puntos)</ListItem>
-          <ListItem sx={listItemStyles}>8. Despliegue en un servicio en la nube: Vercel (10 puntos)</ListItem>
-          <ListItem sx={listItemStyles}>9. Tech Stack: React y TypeScript</ListItem>
-          <ListItem sx={listItemStyles}>10. Framework de diseño: Material UI</ListItem>
-          <ListItem sx={listItemStyles}>11. Gestión de estado global: TanStack Query</ListItem>
-          <ListItem sx={listItemStyles}>12. Lógica de autenticación: Auth0</ListItem>
-        </List>
+                <ListItem sx={listItemStyles}>1. Carga de archivos mediante HTTP</ListItem>
+                <ListItem sx={listItemStyles}>2. Simulación de endpoints requeridos</ListItem>
+                <ListItem sx={listItemStyles}>3. Vista previa de la imagen a procesar</ListItem>
+                <ListItem sx={listItemStyles}>4. Generación y visualización de URLs de miniaturas</ListItem>
+                <ListItem sx={listItemStyles}>5. Funcionalidades del MVP (50 puntos)</ListItem>
+                <ListItem sx={listItemStyles}>6. Funcionalidad de arrastrar y soltar (5 puntos)</ListItem>
+                <ListItem sx={listItemStyles}>7. Área de recorte y redimensionamiento (5 puntos)</ListItem>
+                <ListItem sx={listItemStyles}>8. Despliegue en un servicio en la nube: Vercel (10 puntos)</ListItem>
+                <ListItem sx={listItemStyles}>9. Tech Stack: React y TypeScript</ListItem>
+                <ListItem sx={listItemStyles}>10. Framework de diseño: Material UI</ListItem>
+                <ListItem sx={listItemStyles}>11. Gestión de estado global: TanStack Query</ListItem>
+                <ListItem sx={listItemStyles}>12. Lógica de autenticación: Auth0</ListItem>
+              </List>
             </Container>
           </Box>
         )}
