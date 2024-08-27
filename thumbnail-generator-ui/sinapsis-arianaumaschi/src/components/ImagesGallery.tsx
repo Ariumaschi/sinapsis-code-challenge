@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, ImageList, ImageListItem, ImageListItemBar } from '@mui/material';
 import { useMediaQuery, useTheme } from '@mui/material';
 
-interface ImagesGalleryProps {
+interface ImagesGalleryProps { //Define la forma de las propiedades (props) 
     thumbnailUrls: { url: string; image: string }[];
 }
 
@@ -43,9 +43,9 @@ const ImagesGallery: React.FC<ImagesGalleryProps> = ({ thumbnailUrls }) => {
                             justifyContent: 'center',
                             alignItems: 'center',
                             overflow: 'hidden',
-                            border: `4px solid black`, 
+                            border: `4px solid black`,
                             borderRadius: 2,
-                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',  
+                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                         }}
                     >
                         <img
@@ -76,9 +76,9 @@ const ImagesGallery: React.FC<ImagesGalleryProps> = ({ thumbnailUrls }) => {
                             }
                             position="below"
                             sx={{
-                                backgroundColor: '#ffffff',  
-                                color: theme.palette.text.primary,  
-                                borderTop: `1px solid black`,  
+                                backgroundColor: '#ffffff',
+                                color: theme.palette.text.primary,
+                                borderTop: `1px solid black`,
                                 width: '100%',
                                 textAlign: 'center',
                             }}

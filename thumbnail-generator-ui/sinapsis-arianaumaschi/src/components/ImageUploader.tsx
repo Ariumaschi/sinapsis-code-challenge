@@ -5,6 +5,9 @@ import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import ImagesGallery from './ImagesGallery';
 
+//React Functional Component
+    //Autocompletado y verificación de tipos en las props.
+    //Asegura que el componente siempre devuelve un ReactElement o null.
 
 const ImageUploader: React.FC = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -26,13 +29,14 @@ const ImageUploader: React.FC = () => {
     const imageRef = useRef<HTMLImageElement | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    const theme = useTheme();
+    const theme = useTheme(); //hook proporcionado por Material-UI para acceder a estilos globales 
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => { //event es del tipo React.ChangeEvent<HTMLInputElement>
         const file = event.target.files?.[0];
         if (file) {
+            setEditImage(false)
             setSelectedFile(file);
             setPreviewUrl(URL.createObjectURL(file));
         }
@@ -61,24 +65,20 @@ const ImageUploader: React.FC = () => {
             console.log("croppedImageUrl ok");
             setLoading(true);
             try {
-                // URL de vista previa recortada
                 setPreviewUrl(croppedImageUrl);
 
                 if (!selectedFile) {
                     throw new Error('No se ha seleccionado ningún archivo.');
                 }
 
-                // Limpiar el valor del input de archivo
                 if (fileInputRef.current) {
                     fileInputRef.current.value = '';
                 }
 
-                // Convertir la URL de la imagen recortada en un archivo
                 const croppedFile = await fetch(croppedImageUrl)
-                    .then((r) => r.blob())
-                    .then((blobFile) => new File([blobFile], selectedFile.name, { type: selectedFile.type }));
+                    .then((r) => r.blob()) //Convierte la respuesta en un Blob, un objeto que representa datos de archivo binarios
+                    .then((blobFile) => new File([blobFile], selectedFile.name, { type: selectedFile.type })); //crea un nuevo archivo a partir del Blob con nombre y tipo 
 
-                // Subir la imagen recortada
                 const { url, image } = await uploadImage(croppedFile);
                 setThumbnailUrls((prevUrls) => [...prevUrls, { url, image }]);
                 setCroppedImageUrl(null)
@@ -96,11 +96,11 @@ const ImageUploader: React.FC = () => {
         }
     };
 
-    const onImageLoaded = (event: React.SyntheticEvent<HTMLImageElement>) => {
-        const image = event.currentTarget; // Acceder al elemento de imagen
+    const onImageLoaded = (event: React.SyntheticEvent<HTMLImageElement>) => { //SyntheticEvent eventos generales y no necesitas propiedades de eventos más específicos.
+        const image = event.currentTarget; //referencia al elemento HTML en el que ocurrió el evento, img cargada.
         imageRef.current = image;
 
-        const { width, height } = image;
+        const { width, height } = image; //ancho y alto en píxeles de la imagen cargada.
         console.log(image)
         setCrop({
             unit: 'px',
@@ -119,13 +119,6 @@ const ImageUploader: React.FC = () => {
         return false;
     };
 
-    const onCropComplete = (crop: Crop) => {
-        setCompletedCrop(crop);
-    };
-
-    const onCropChange = (crop: Crop) => {
-        setCrop(crop);
-    };
 
     const generateCroppedImage = useCallback(() => {
         console.log('generating')
@@ -137,20 +130,21 @@ const ImageUploader: React.FC = () => {
             return;
         }
         console.log('Intentando crear el canvas');
-        const canvas = document.createElement('canvas');
-        console.log(canvas); // Verificar si el canvas fue creado
+        const canvas = document.createElement('canvas'); // El <canvas> es un elemento HTML que permite dibujar gráficos
+        console.log('canvas', canvas); // Verificar si el canvas fue creado
 
-        const scaleX = imageRef.current.naturalWidth / imageRef.current.width;
+        const scaleX = imageRef.current.naturalWidth / imageRef.current.width; //a cuánto se ha escalado la imagen desde su tamaño original (naturalWidth) hasta el tamaño que se está mostrando actualmente en el DOM (width).
         const scaleY = imageRef.current.naturalHeight / imageRef.current.height;
         canvas.width = completedCrop.width!;
         canvas.height = completedCrop.height!;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d'); //es un objeto que proporciona métodos para realizar operaciones de dibujo en el <canvas>
 
         if (ctx) {
+            console.log('ctx es', ctx);
 
             ctx.drawImage(
                 imageRef.current,
-                completedCrop.x! * scaleX,
+                completedCrop.x! * scaleX, //La coordenada X del recorte ajustada por la escala.
                 completedCrop.y! * scaleY,
                 completedCrop.width! * scaleX,
                 completedCrop.height! * scaleY,
@@ -163,7 +157,7 @@ const ImageUploader: React.FC = () => {
             canvas.toBlob((blob) => {
                 console.log(blob);
                 if (blob) {
-                    setCroppedImageUrl(URL.createObjectURL(blob));
+                    setCroppedImageUrl(URL.createObjectURL(blob)); //convertir el canvas a un blob para crear una URL y  mostrar una vista previa sin necesidad de subirla al servidor.
                     console.log(croppedImageUrl)
                 }
             }, 'image/jpeg');
@@ -204,38 +198,41 @@ const ImageUploader: React.FC = () => {
                 backgroundColor: '#f2f2f2',
                 boxSizing: 'border-box'
             }}
-        >          <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                width: '100%',
-                maxWidth: 800,
-                p: 4,
-                borderRadius: 4,
-                textAlign: 'center',
-                mt: 4,
-                backgroundColor: isDragging ? '#f7e6b4' : '#f2f2f2',
-                border: isDragging ? '2px dashed black' : '2px solid black',
-                transition: 'background-color 0.3s, border 0.3s',
-                cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-                minHeight: '350px',
-                justifyContent: 'center',
-                boxSizing: 'border-box',
-            }}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
         >
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    width: '100%',
+                    maxWidth: 800,
+                    p: 4,
+                    borderRadius: 4,
+                    textAlign: 'center',
+                    mt: 4,
+                    backgroundColor: isDragging ? '#f7e6b4' : '#f2f2f2',
+                    border: isDragging ? '2px dashed black' : '2px solid black',
+                    transition: 'background-color 0.3s, border 0.3s',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+                    minHeight: '350px',
+                    justifyContent: 'center',
+                    boxSizing: 'border-box',
+                }}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+            >
                 <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: 'black' }}>
                     {isDragging ? 'Suelta el archivo aquí' : 'Arrastra y suelta un archivo o selecciona uno'}
                 </Typography>
 
                 <Button
                     variant="contained"
-                    onClick={() => setPreviewUrl(null)}
-
+                    onClick={() => {
+                        setPreviewUrl(null);
+                        setEditImage(false);
+                    }}
                     component="label"
                     sx={{
                         mb: 3,
@@ -249,7 +246,7 @@ const ImageUploader: React.FC = () => {
                     }}
                 >
                     Seleccionar archivo
-                    <Input type="file" onChange={handleFileChange} inputRef={fileInputRef} sx={{ display: 'none' }} />
+                    <Input type="file" onChange={handleFileChange} inputProps={{ accept: 'image/*' }} inputRef={fileInputRef} sx={{ display: 'none' }} />
                 </Button>
 
 
@@ -257,12 +254,13 @@ const ImageUploader: React.FC = () => {
                     {/* Mostrar la vista previa si hay previewUrl y editImage es falso */}
                     {previewUrl && !editImage && (
                         <Box sx={{ mb: 2 }}>
-                            <Typography variant="h6">Vista previa:</Typography>
+                            <Typography variant="h6">Vista previa</Typography>
                             <img
                                 src={previewUrl}
                                 alt="Vista previa"
                                 style={{ maxWidth: '100%', maxHeight: '40vh' }}
                             />
+
                             <Box sx={{ mb: 3, width: '100%', maxWidth: 600, display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '2%' }}>
                                 <Button
                                     onClick={() => setEditImage(true)}
@@ -308,6 +306,7 @@ const ImageUploader: React.FC = () => {
                             <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: 'black' }}>
                                 Recortar Imagen:
                             </Typography>
+
                             <ReactCrop
                                 crop={crop}
                                 onChange={(newCrop) => setCrop(newCrop)}
