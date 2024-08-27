@@ -29,7 +29,7 @@ const ImageUploader: React.FC = () => {
     const imageRef = useRef<HTMLImageElement | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    const theme = useTheme(); //hook proporcionado por Material-UI para acceder a estilos globales 
+    const theme = useTheme();   
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
 
@@ -76,8 +76,8 @@ const ImageUploader: React.FC = () => {
                 }
 
                 const croppedFile = await fetch(croppedImageUrl)
-                    .then((r) => r.blob()) //Convierte la respuesta en un Blob, un objeto que representa datos de archivo binarios
-                    .then((blobFile) => new File([blobFile], selectedFile.name, { type: selectedFile.type })); //crea un nuevo archivo a partir del Blob con nombre y tipo 
+                    .then((r) => r.blob())  
+                    .then((blobFile) => new File([blobFile], selectedFile.name, { type: selectedFile.type })); 
 
                 const { url, image } = await uploadImage(croppedFile);
                 setThumbnailUrls((prevUrls) => [...prevUrls, { url, image }]);
@@ -96,7 +96,7 @@ const ImageUploader: React.FC = () => {
         }
     };
 
-    const onImageLoaded = (event: React.SyntheticEvent<HTMLImageElement>) => { //SyntheticEvent eventos generales y no necesitas propiedades de eventos más específicos.
+    const onImageLoaded = (event: React.SyntheticEvent<HTMLImageElement>) => {  
         const image = event.currentTarget; //referencia al elemento HTML en el que ocurrió el evento, img cargada.
         imageRef.current = image;
 
